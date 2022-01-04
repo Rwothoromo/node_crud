@@ -12,5 +12,8 @@ app.listen(3000, function () {
 
 // req - request, res - response
 app.get('/', (req, res) => {
-    res.send('Hello World')
+    // res.send('Hello World')
+    res.sendFile(__dirname + '/index.html')
+    // Note: __dirname is the current directory you're in. Try logging it and see what you get!
+    // Mine was '/home/xxx/Desktop/code/backend/node_crud' for this app.
 })
