@@ -38,6 +38,12 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         // and add this data to the body property in the request object.
         app.use(bodyParser.urlencoded({ extended: true }))
 
+        // tell Express to make this `public` folder accessible to the public by using a built-in middleware called `express.static`
+        app.use(express.static('public'))
+
+        // teach the server to accept/read JSON data by adding the body-parser’s json middleware.
+        app.use(bodyParser.json())
+
         // (endpoint, callback function(req - request, res - response))
         app.get('/', (req, res) => {
             // res.send('Hello World')
@@ -66,6 +72,32 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                     console.log('Quote submitted successfully!')
                     console.log(result)
                     res.redirect('/')
+                })
+                .catch(error => console.error(error))
+        })
+
+        // to find and change one item in the database, run
+        // quotesCollection.findOneAndUpdate(query, update, options)
+        // query lets us filter the collection with key-value pairs. To filter quotes to those written by Yoda, set { name: 'Yoda' } as the query.
+        // update tells MongoDB what to change, using MongoDB’s update operators like $set, $inc and $push.
+        // options tells MongoDB to define additional options for this update request.
+        // it’s possible that no Yoda quotes exist in the database. We can force MongoDB to create a new quote by setting `upsert` to true.
+        // upsert means: Insert a document if no documents can be updated.
+        app.put('/quotes', (req, res) => {
+            quotesCollection.findOneAndUpdate(
+                { name: 'Yoda' },
+                {
+                    $set: {
+                        name: req.body.name,
+                        quote: req.body.quote
+                    }
+                },
+                {
+                    upsert: true
+                }
+            )
+                .then(result => {
+                    res.json('Success')
                 })
                 .catch(error => console.error(error))
         })
