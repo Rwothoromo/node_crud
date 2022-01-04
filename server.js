@@ -29,6 +29,9 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         // store the quotes into a `quotes` collection. We use db.collection to specify the collection.
         const quotesCollection = db.collection('quotes')
 
+        // tell Express that we’re using EJS as the template engine.
+        app.set('view engine', 'ejs')
+
         // Make sure you place body-parser before your CRUD handlers!
         // Express lets us use middleware with the `use` method.
         // The urlencoded method within body-parser tells it to extract data from the <form> element
@@ -38,7 +41,20 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         // (endpoint, callback function(req - request, res - response))
         app.get('/', (req, res) => {
             // res.send('Hello World')
-            res.sendFile(__dirname + '/index.html')
+
+            const cursor = db.collection('quotes').find()
+            // a promise is returned
+            cursor.toArray()
+                .then(results => {
+                    // to render html, use:
+                    // res.render(view, locals)
+                    // view must be placed inside a views folder.
+                    // locals is the data passed into the file.
+                    res.render('index.ejs', { quotes: results })
+                })
+                .catch(error => console.error(error))
+
+            // res.sendFile(__dirname + '/index.html')
             // Note: __dirname is the current directory you're in. Try logging it and see what you get!
             // Mine was '/home/xxx/Desktop/code/backend/node_crud' for this app.
         })
