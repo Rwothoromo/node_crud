@@ -4,6 +4,8 @@ console.log('May Node be with you')
 // It simplifies the server creation process that is already available in Node.
 const express = require('express');
 const bodyParser = require('body-parser');
+const MongoClient = require('mongodb').MongoClient
+const connectionString = "mongodb+srv://rwothoromo:rwothoromo1234@cluster0.ra6ne.mongodb.net/nodeCrudDB?retryWrites=true&w=majority"
 const app = express();
 
 // Create a server that browsers can connect to. Use Express’s `listen` method.
@@ -11,21 +13,45 @@ app.listen(3000, function () {
     console.log('listening on 3000')
 })
 
-// Make sure you place body-parser before your CRUD handlers!
-// Express lets us use middleware with the `use` method.
-// The urlencoded method within body-parser tells it to extract data from the <form> element
-// and add this data to the body property in the request object.
-app.use(bodyParser.urlencoded({ extended: true }))
 
-// (endpoint, callback function(req - request, res - response))
-app.get('/', (req, res) => {
-    // res.send('Hello World')
-    res.sendFile(__dirname + '/index.html')
-    // Note: __dirname is the current directory you're in. Try logging it and see what you get!
-    // Mine was '/home/xxx/Desktop/code/backend/node_crud' for this app.
-})
+// MongoClient.connect(connectionString, (err, client) => {
+//     if (err) return console.error(err)
+//     console.log('Connected to Database')
+// })
 
-app.post('/quotes', (req, res) => {
-    console.log(req.body)
-    console.log('Quote submitted successfully!')
-})
+MongoClient.connect(connectionString, { useUnifiedTopology: true })
+    .then(client => {
+        console.log('Connected to Database')
+
+        // to change the db, use this optio line of code
+        const db = client.db('star-wars-quotes')
+
+        // store the quotes into a `quotes` collection. We use db.collection to specify the collection.
+        const quotesCollection = db.collection('quotes')
+
+        // Make sure you place body-parser before your CRUD handlers!
+        // Express lets us use middleware with the `use` method.
+        // The urlencoded method within body-parser tells it to extract data from the <form> element
+        // and add this data to the body property in the request object.
+        app.use(bodyParser.urlencoded({ extended: true }))
+
+        // (endpoint, callback function(req - request, res - response))
+        app.get('/', (req, res) => {
+            // res.send('Hello World')
+            res.sendFile(__dirname + '/index.html')
+            // Note: __dirname is the current directory you're in. Try logging it and see what you get!
+            // Mine was '/home/xxx/Desktop/code/backend/node_crud' for this app.
+        })
+
+        app.post('/quotes', (req, res) => {
+            quotesCollection.insertOne(req.body)
+                .then(result => {
+                    console.log(req.body)
+                    console.log('Quote submitted successfully!')
+                    console.log(result)
+                    res.redirect('/')
+                })
+                .catch(error => console.error(error))
+        })
+    })
+    .catch(error => console.error(error))
