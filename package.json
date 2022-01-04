@@ -19,7 +19,8 @@
   "homepage": "https://github.com/Rwothoromo/node_crud#readme",
   "dependencies": {
     "body-parser": "^1.19.1",
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "mongodb": "^4.2.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
