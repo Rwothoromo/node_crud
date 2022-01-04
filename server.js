@@ -9,3 +9,8 @@ const app = express();
 app.listen(3000, function () {
     console.log('listening on 3000')
 })
+
+// req - request, res - response
+app.get('/', (req, res) => {
+    res.send('Hello World')
+})
