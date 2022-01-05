@@ -5,7 +5,10 @@ console.log('May Node be with you')
 const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient
-const connectionString = "mongodb+srv://rwothoromo:rwothoromo1234@cluster0.ra6ne.mongodb.net/nodeCrudDB?retryWrites=true&w=majority"
+
+require('dotenv').config();
+console.log(process.env.USER_NAME)
+const connectionString = "mongodb+srv://" + process.env.USER_NAME + ":" + process.env.USER_PASS + "@cluster0.ra6ne.mongodb.net/" + process.env.USER_DB + "?retryWrites=true&w=majority"
 const app = express();
 
 // Create a server that browsers can connect to. Use Express’s `listen` method.

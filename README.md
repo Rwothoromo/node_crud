@@ -12,4 +12,12 @@ A simple CRUD API with Node based on this [blog](https://zellwk.com/blog/crud-ex
 
 ## Set Up
 
+- Run `touch .env` and set values:
+
+```env
+USER_NAME=username
+USER_PASS=password
+USER_DB=nodeCrudDB
+```
+
 - Run `npm run dev` or `node server.js`.
