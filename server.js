@@ -11,8 +11,10 @@ const connectionString = "mongodb+srv://" + process.env.USER_NAME + ":" + proces
 const app = express();
 
 // Create a server that browsers can connect to. Use Express’s `listen` method.
-app.listen(3000, function () {
-    console.log('listening on 3000')
+const PORT = process.env.USER_PORT || 3000;
+const HOST = process.env.USER_HOST || '0.0.0.0';
+app.listen(PORT, HOST, function () {
+    console.log('listening on http://' + HOST + ':' + PORT)
 })
 
 
@@ -21,6 +23,10 @@ app.listen(3000, function () {
 //     console.log('Connected to Database')
 // })
 
+// According to https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/, useUnifiedTopology to:
+// - fully support the drivers Server Discovery and Monitoring, Server Selection and Max Staleness specifications
+// - reduce the maintenance burden of supporting the topology layer in the driver by modeling all supported topology types with a single engine
+// - remove confusing functionality which could be potentially dangerous for our users
 MongoClient.connect(connectionString, { useUnifiedTopology: true })
     .then(client => {
         console.log('Connected to Database')
