@@ -32,3 +32,19 @@ deleteButton.addEventListener('click', _ => {
             window.location.reload()
         })
 })
+
+
+const deleteAllButton = document.querySelector('#delete-button-all')
+
+deleteAllButton.addEventListener('click', _ => {
+    fetch('/quotes', {
+        method: 'delete',
+        headers: { 'Content-Type': 'application/json' }
+    })
+        .then(res => {
+            if (res.ok) res.json('Success') // return res.json()
+        })
+        .then(data => {
+            window.location.reload()
+        })
+})
