@@ -1,12 +1,14 @@
-console.log('May Node be with you')
-
 // Express is a framework for building web applications on top of Node.js.
 // It simplifies the server creation process that is already available in Node.
 const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient
+const morgan = require('morgan');
 
 require('dotenv').config();
+if (process.env.NODE_ENV == 'test') {
+    process.env.USER_DB = 'nodeCrudDBTest';
+}
 const connectionString = "mongodb+srv://" + process.env.USER_NAME + ":" + process.env.USER_PASS + "@cluster0.ra6ne.mongodb.net/" + process.env.USER_DB + "?retryWrites=true&w=majority"
 const app = express();
 
@@ -16,12 +18,6 @@ const HOST = process.env.USER_HOST || '0.0.0.0';
 app.listen(PORT, HOST, function () {
     console.log('listening on http://' + HOST + ':' + PORT)
 })
-
-
-// MongoClient.connect(connectionString, (err, client) => {
-//     if (err) return console.error(err)
-//     console.log('Connected to Database')
-// })
 
 // According to https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/, useUnifiedTopology to:
 // - fully support the drivers Server Discovery and Monitoring, Server Selection and Max Staleness specifications
@@ -39,6 +35,12 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
 
         // tell Express that we’re using EJS as the template engine.
         app.set('view engine', 'ejs')
+
+        // don't show the log when it is test
+        if (process.env.NODE_ENV !== 'test') {
+            // use morgan to log at command line
+            app.use(morgan('combined')); // 'combined' outputs the Apache style LOGs
+        }
 
         // Make sure you place body-parser before your CRUD handlers!
         // Express lets us use middleware with the `use` method.
@@ -73,12 +75,19 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
             // Mine was '/home/xxx/Desktop/code/backend/node_crud' for this app.
         })
 
+        app.get('/quotes', (req, res) => {
+            const cursor = db.collection('quotes').find()
+            cursor.toArray()
+                .then(results => {
+                    return res.json(results)
+                })
+                .catch(error => console.error(error))
+        })
+
         app.post('/quotes', (req, res) => {
             quotesCollection.insertOne(req.body)
                 .then(result => {
-                    console.log(req.body)
                     console.log('Quote submitted successfully!')
-                    console.log(result)
                     res.redirect('/')
                 })
                 .catch(error => console.error(error))
@@ -110,18 +119,33 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                 .catch(error => console.error(error))
         })
 
-        app.delete('/quotes', (req, res) => {
+        app.delete('/quotes/one', (req, res) => {
             quotesCollection.deleteOne(
                 // we already pass the name `Darth Vadar` via fetch in main.js
                 { name: req.body.name }
             )
                 .then(result => {
                     if (result.deletedCount === 0) {
-                        return res.json('No quote to delete')
+                        return res.json({ "message": "No quote to delete'" })
                     }
-                    res.json("Deleted Darth Vadar's quote")
+                    res.json({ "message": "Deleted Darth Vadar's quote" })
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.delete('/quotes', (req, res) => {
+            quotesCollection.deleteMany(
+                {} // delete all
+            )
+                .then(result => {
+                    if (result.deletedCount === 0) {
+                        return res.json({ "message": "No quote to delete" })
+                    }
+                    res.json()
                 })
                 .catch(error => console.error(error))
         })
     })
     .catch(error => console.error(error))
+
+module.exports = app

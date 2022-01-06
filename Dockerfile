@@ -26,5 +26,5 @@ COPY . .
 EXPOSE 8080
 
 # Define the command to run your app using CMD which defines your runtime e.g. `node server.js`
-# CMD [ "node", "server.js" ]
-CMD [ "npm", "run", "dev" ]
+CMD [ "node", "server.js" ]
+# CMD [ "npm", "run", "dev" ]
