@@ -91,10 +91,10 @@ describe('Quotes', () => {
                     res.should.have.status(404);
                     res.body.should.be.a('object');
                     chaiExpect(res.body).to.deep.equal({})
+                    res.body.should.have.property('errors');
+                    res.body.errors.should.have.property('quote');
+                    res.body.errors.quote.should.have.property('quote').eql('required');
                     done();
-                    // .. res.body.should.have.property('errors');
-                    // res.body.errors.should.have.property('name');
-                    // res.body.errors.pages.should.have.property('quote').eql('required');
                 });
         });
     });
@@ -131,7 +131,7 @@ describe('Quotes', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
-                    res.body.length.should.be.eql(1);
+                    res.body.length.should.be.greaterThan(0);
 
                     expect(res.body).to.have.value(
                         {

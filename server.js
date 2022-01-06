@@ -7,7 +7,7 @@ const morgan = require('morgan');
 
 require('dotenv').config();
 if (process.env.NODE_ENV == 'test') {
-    process.env.USER_DB = 'nodeCrudDBTest';
+    // process.env.USER_DB = 'nodeCrudDBTest';
 }
 const connectionString = "mongodb+srv://" + process.env.USER_NAME + ":" + process.env.USER_PASS + "@cluster0.ra6ne.mongodb.net/" + process.env.USER_DB + "?retryWrites=true&w=majority"
 const app = express();
@@ -114,7 +114,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                 }
             )
                 .then(result => {
-                    res.json('Success')
+                    res.json(result)
                 })
                 .catch(error => console.error(error))
         })
@@ -141,7 +141,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                     if (result.deletedCount === 0) {
                         return res.json({ "message": "No quote to delete" })
                     }
-                    res.json()
+                    res.json({ "message": "Deleted all quote" })
                 })
                 .catch(error => console.error(error))
         })
